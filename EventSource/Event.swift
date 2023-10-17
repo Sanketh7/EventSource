@@ -71,7 +71,7 @@ private extension Event {
                 event[key] = nil
             }
         }
-
+        
         // the only possible field names for events are: id, event and data. Everything else is ignored.
         return .event(
             id: event["id"] ?? nil,
@@ -82,13 +82,16 @@ private extension Event {
     }
 
     static func parseLine(_ line: String, newLineCharacters: [String]) -> (key: String?, value: String?) {
-        var key: NSString?, value: NSString?
+        var key: String?, value: String?
         let scanner = Scanner(string: line)
-        scanner.scanUpTo(":", into: &key)
-        scanner.scanString(":", into: nil)
+        scanner.charactersToBeSkipped = .newlines
+        key = scanner.scanUpToString(":")
+        _ = scanner.scanString(":")
+        _ = scanner.scanString(" ")
 
         for newline in newLineCharacters {
-            if scanner.scanUpTo(newline, into: &value) {
+            value = scanner.scanUpToString(newline)
+            if value != nil {
                 break
             }
         }
@@ -98,6 +101,6 @@ private extension Event {
             value = ""
         }
 
-        return (key as String?, value as String?)
+        return (key, value)
     }
 }
