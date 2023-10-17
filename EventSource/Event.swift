@@ -71,7 +71,7 @@ private extension Event {
                 event[key] = nil
             }
         }
-        
+
         // the only possible field names for events are: id, event and data. Everything else is ignored.
         return .event(
             id: event["id"] ?? nil,
@@ -85,14 +85,30 @@ private extension Event {
         var key: String?, value: String?
         let scanner = Scanner(string: line)
         scanner.charactersToBeSkipped = .newlines
-        key = scanner.scanUpToString(":")
-        _ = scanner.scanString(":")
-        _ = scanner.scanString(" ")
+        if #available(iOS 13, *) {
+            key = scanner.scanUpToString(":")
+            _ = scanner.scanString(":")
+            _ = scanner.scanString(" ")
+        } else {
+            var tmpKey: NSString?
+            scanner.scanUpTo(":", into: &tmpKey)
+            _ = scanner.scanString(":", into: nil)
+            _ = scanner.scanString(" ", into: nil)
+            key = tmpKey as String?
+        }
 
         for newline in newLineCharacters {
-            value = scanner.scanUpToString(newline)
-            if value != nil {
-                break
+            if #available(iOS 13, *) {
+                value = scanner.scanUpToString(newline)
+                if value != nil {
+                    break
+                }
+            } else {
+                var tmpValue: String?
+                if scanner.scanUpTo(newline, into: &tmpValue) {
+                    value = tmpValue as String?
+                    break
+                }
             }
         }
 
