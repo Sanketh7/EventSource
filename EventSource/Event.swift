@@ -104,7 +104,7 @@ private extension Event {
                     break
                 }
             } else {
-                var tmpValue: String?
+                var tmpValue: NSString?
                 if scanner.scanUpTo(newline, into: &tmpValue) {
                     value = tmpValue as String?
                     break
